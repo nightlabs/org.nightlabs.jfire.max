@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:Offer.Vendor" width="1280" height="1004">
+  <node name="dev.jfire.org:created" x="-24" y="17" width="190" height="40">
+    <edge>
+      <label x="-122" y="-52"/>
+      <bendpoint w1="231" h1="75" w2="-1" h2="-114"/>
+    </edge>
+    <edge>
+      <label x="-26" y="-15"/>
+    </edge>
+    <edge>
+      <label x="-12" y="5"/>
+    </edge>
+    <edge>
+      <label x="-240" y="-23"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:rejected" x="456" y="336" width="217" height="40"/>
+  <node name="dev.jfire.org:accepted" x="-28" y="313" width="199" height="40"/>
+  <node name="dev.jfire.org:finalized" x="208" y="206" width="190" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="136" h1="166" w2="-125" h2="-36"/>
+    </edge>
+    <edge>
+      <label x="0" y="-17"/>
+      <bendpoint w1="81" h1="271" w2="-180" h2="-3"/>
+    </edge>
+    <edge>
+      <label x="-2" y="19"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="-16" y="-17"/>
+    </edge>
+    <edge>
+      <label x="-22" y="6"/>
+      <bendpoint w1="-102" h1="63" w2="130" h2="-44"/>
+    </edge>
+    <edge>
+      <label x="-65" y="-17"/>
+      <bendpoint w1="-155" h1="-28" w2="174" h2="-30"/>
+    </edge>
+    <edge>
+      <label x="-15" y="6"/>
+      <bendpoint w1="-130" h1="35" w2="102" h2="-72"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:expired" x="456" y="408" width="217" height="40"/>
+  <node name="dev.jfire.org:aborted" x="453" y="16" width="217" height="40"/>
+  <node name="dev.jfire.org:revoked" x="456" y="480" width="217" height="40"/>
+  <node name="dev.jfire.org:customerAccepted" x="-41" y="491" width="225" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:customerRejected" x="456" y="252" width="217" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sent" x="-134" y="208" width="216" height="40">
+    <edge>
+      <label x="-60" y="-29"/>
+      <bendpoint w1="168" h1="22" w2="-161" h2="24"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:acceptedImplicitely" x="-156" y="105" width="261" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sentForCrossTrade" x="-453" y="273" width="290" height="40">
+    <edge>
+      <label x="2" y="-39"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:acceptedForCrossTrade" x="-456" y="392" width="296" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:finalizedForCrossTrade" x="-453" y="120" width="288" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+</root-container>

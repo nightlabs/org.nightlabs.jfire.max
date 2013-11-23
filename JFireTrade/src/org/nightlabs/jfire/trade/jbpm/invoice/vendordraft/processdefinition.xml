@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="dev.jfire.org:Invoice.Vendor">
+   <start-state name="dev.jfire.org:created">
+      <transition name="abort" to="dev.jfire.org:aborted"></transition>
+      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+      <transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
+   </start-state>
+   <state name="dev.jfire.org:finalized">
+      <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
+   </state>
+   <end-state name="dev.jfire.org:aborted"></end-state>
+   <state name="dev.jfire.org:doubtful">
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+      <transition name="bookUnreceivable" to="dev.jfire.org:bookedUnreceivable"></transition>
+      <transition name="trust" to="dev.jfire.org:sent"></transition>
+   </state>
+   <end-state name="dev.jfire.org:uncollectable"></end-state>
+   <end-state name="dev.jfire.org:paid"></end-state>
+   <state name="dev.jfire.org:booked">
+      <transition to="dev.jfire.org:send" name="dev.jfire.org:send"></transition>
+   </state>
+   <node name="dev.jfire.org:bookedUnreceivable">
+      <transition name="endAsUncollectable" to="dev.jfire.org:uncollectable"></transition>
+   </node>
+   <state name="dev.jfire.org:sentReminder">
+      <transition name="sendPreCollectionLetter" to="dev.jfire.org:sentPreCollectionLetter"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+   </state>
+   <state name="dev.jfire.org:sentPreCollectionLetter">
+      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+   </state>
+   <node name="dev.jfire.org:bookedImplicitely">
+      <transition name="" to="dev.jfire.org:booked"></transition>
+   </node>
+
+	<state name="dev.jfire.org:sent">
+		<transition to="dev.jfire.org:paid" name="dev.jfire.org:pay"></transition>
+		<transition to="dev.jfire.org:sentReminder" name="sendReminder"></transition>
+		<transition to="dev.jfire.org:doubtful" name="doubt"></transition>
+		<transition to="dev.jfire.org:send" name="to dev.jfire.org:send"></transition>
+	</state>
+
+	<node name="dev.jfire.org:send">
+		<transition to="dev.jfire.org:sent" name="dev.jfire.org:send"></transition>
+	</node>
+</process-definition>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="dev.jfire.org:Invoice.Vendor">
+   <start-state name="dev.jfire.org:created">
+      <transition name="abort" to="dev.jfire.org:aborted"></transition>
+      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+      <transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
+   </start-state>
+   <state name="dev.jfire.org:finalized">
+   		<event type="node-enter">
+			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice" />
+		</event>
+      <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
+   </state>
+   <end-state name="dev.jfire.org:aborted"></end-state>
+   <state name="dev.jfire.org:doubtful">
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+      <transition name="bookUnreceivable" to="dev.jfire.org:bookedUnreceivable"></transition>
+      <transition name="trust" to="dev.jfire.org:booked"></transition>
+   </state>
+   <end-state name="dev.jfire.org:uncollectable"></end-state>
+   <end-state name="dev.jfire.org:paid"></end-state>
+
+
+	<event type="process-end">
+		<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerInvoiceProcessEnd"></action>
+	</event>
+	<state name="dev.jfire.org:booked">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice" />
+		</event>
+		<transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+		<transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+		<transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+		<transition name="sendReminder" to="dev.jfire.org:sentReminder"></transition>
+	</state>
+   <node name="dev.jfire.org:sent">
+      <transition name="" to="dev.jfire.org:booked"></transition>
+   </node>
+   <node name="dev.jfire.org:bookedUnreceivable">
+      <transition name="endAsUncollectable" to="dev.jfire.org:uncollectable"></transition>
+   </node>
+   <state name="dev.jfire.org:sentReminder">
+      <transition name="sendPreCollectionLetter" to="dev.jfire.org:sentPreCollectionLetter"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+   </state>
+   <state name="dev.jfire.org:sentPreCollectionLetter">
+      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+   </state>
+	<node name="dev.jfire.org:bookedImplicitely">
+		<event type="node-enter">
+			<action class="org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoiceImplicitely" />
+		</event>
+		<transition name="" to="dev.jfire.org:booked"></transition>
+	</node>
+</process-definition>

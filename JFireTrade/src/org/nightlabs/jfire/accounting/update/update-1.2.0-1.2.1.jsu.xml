@@ -1,0 +1,14 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="JFireTradeEAR|1.2.0|1.2.1" author="jfire">
+		<comment>Introduce a discriminator for Anchor</comment>
+		
+		<ext:dnIntroduceDiscriminator className="org.nightlabs.jfire.transfer.Anchor"/>
+	</changeSet>
+    
+</databaseChangeLog>

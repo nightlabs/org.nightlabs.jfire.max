@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:DeliveryNote.Vendor" width="823" height="1023">
+  <node name="dev.jfire.org:created" x="5" y="6" width="206" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="-52" y="-13"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:finalized" x="5" y="117" width="206" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:booked" x="5" y="226" width="207" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:aborted" x="320" y="5" width="181" height="40"/>
+  <node name="dev.jfire.org:delivered" x="4" y="363" width="210" height="40"/>
+  <node name="dev.jfire.org:sent" x="320" y="227" width="181" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="-141" h1="27" w2="161" h2="28"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:bookedImplicitely" x="294" y="117" width="246" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+</root-container>

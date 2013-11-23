@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="dev.jfire.org:ReceptionNote.CustomerCrossOrganisation">
+   <start-state name="dev.jfire.org:created">
+      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+   </start-state>
+   <state name="dev.jfire.org:finalized">
+      <transition name="dev.jfire.org:deliver" to="dev.jfire.org:delivered"></transition>
+   </state>
+   <state name="dev.jfire.org:booked">
+      <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+   </state>
+   <end-state name="dev.jfire.org:sent"></end-state>
+   <state name="dev.jfire.org:delivered">
+      <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
+   </state>
+</process-definition>

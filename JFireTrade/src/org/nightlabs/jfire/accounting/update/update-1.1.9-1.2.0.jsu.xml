@@ -1,0 +1,25 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet id="JFireTradeEAR|1.1.9|1.2.0" author="jfire">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="jfiretrade_payment_payableobjects"/>
+		</preConditions>
+		<comment>Due to the broad semantics of the ext:dnChangeClassName 
+			(rename table, update all discriminator columns up the class hierarchy), we shouldn't use it to rename a table.
+			Unfortunately, the renameTable command doesn't check if the old table exists and hence the following lines would
+			fail if this check isn't done manually.
+			Note that this will most likely not be run for the root organization as it surely hasn't done any payment so far, hence we mark this update as done.
+		</comment>
+		<renameTable oldTableName="jfiretrade_payment_invoices" newTableName="jfiretrade_payment_payableobjects"/>
+		<ext:dnDropAllForeignKeyConstraints tableName="jfiretrade_payment_payableobjects"/>
+		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="invoice_id_eid" newColumnName="payable_objects_invoice_invoice_id_eid"/>
+		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="organisation_id_eid" newColumnName="payable_objects_invoice_organisation_id_eid"/>
+		<ext:dnRenameColumn tableName="jfiretrade_payment_payableobjects" oldColumnName="invoice_idprefix_eid" newColumnName="payable_objects_invoice_invoice_idprefix_eid"/>
+	</changeSet>
+    
+</databaseChangeLog>

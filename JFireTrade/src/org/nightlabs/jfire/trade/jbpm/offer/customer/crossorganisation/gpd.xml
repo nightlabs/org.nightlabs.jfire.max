@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:Offer.CustomerCrossOrganisation" width="1048" height="1424">
+  <node name="dev.jfire.org:created" x="187" y="140" width="206" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="-79" y="-16"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="-223" y="1"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:customerRejected" x="304" y="350" width="236" height="40"/>
+  <node name="dev.jfire.org:customerAccepted" x="7" y="351" width="242" height="40"/>
+  <node name="dev.jfire.org:expired" x="492" y="276" width="224" height="40"/>
+  <node name="dev.jfire.org:revoked" x="584" y="140" width="181" height="40"/>
+  <node name="dev.jfire.org:acceptedImplicitely" x="271" y="41" width="249" height="40"/>
+  <node name="dev.jfire.org:acceptedForCrossTrade" x="-38" y="39" width="287" height="40"/>
+</root-container>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="dev.jfire.org:ReceptionNote.Customer">
+   <start-state name="dev.jfire.org:created">
+      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+   </start-state>
+   <state name="dev.jfire.org:finalized">
+      <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
+   </state>
+   <state name="dev.jfire.org:booked">
+      <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+      <transition name="dev.jfire.org:deliver" to="dev.jfire.org:delivered"></transition>
+   </state>
+   <node name="dev.jfire.org:sent">
+      <transition name="" to="dev.jfire.org:booked"></transition>
+   </node>
+   <end-state name="dev.jfire.org:delivered"></end-state>
+</process-definition>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:ReceptionNote.CustomerCrossOrganisation" width="1009" height="1443">
+  <node name="dev.jfire.org:created" x="4" y="4" width="206" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:finalized" x="3" y="105" width="210" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:booked" x="4" y="312" width="210" height="40">
+    <edge>
+      <label x="4" y="-31"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sent" x="14" y="447" width="191" height="40"/>
+  <node name="dev.jfire.org:delivered" x="2" y="212" width="213" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+</root-container>

@@ -1,0 +1,11 @@
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+
+	<init invocation="org.nightlabs.jfire.issuetimetracking.IssueTimeTrackingManagerRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.base" />
+		<depends invocation="org.nightlabs.jfire.issue" />
+	</init>
+
+</organisation-initialisation>

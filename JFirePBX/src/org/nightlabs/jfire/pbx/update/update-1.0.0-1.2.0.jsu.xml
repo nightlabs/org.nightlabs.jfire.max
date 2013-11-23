@@ -1,0 +1,22 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    
+   <changeSet id="JFirePBXEAR|1.0.0|1.2.0" author="jfire">
+     	<comment>Tables for PBXClasses where moved from Prefix JFireContactPBX_ to JFirePBX_</comment>
+     
+		<ext:dnChangeTableName className="org.nightlabs.jfire.pbx.DefaultPhoneSystem" newTableName="JFirePBX_DefaultPhoneSystem"/>
+		
+		<ext:dnChangeTableName className="org.nightlabs.jfire.pbx.PhoneSystem" newTableName="JFirePBX_PhoneSystem"/>
+		<ext:dnChangeTableName className="org.nightlabs.jfire.pbx.PhoneSystemName" newTableName="JFirePBX_PhoneSystemName"/>
+		<ext:dnChangeTableName className="org.nightlabs.jfire.pbx.PhoneSystemName.names" newTableName="JFirePBX_PhoneSystemName_names"/>
+		
+		<ext:dnChangeTableName className="org.nightlabs.jfire.pbx.config.PhoneSystemConfigModule" newTableName="JFirePBX_PhoneSystemConfigModule"/>
+		
+		<!-- PhoneSystem.callableStructFields is a new field and the appropriate table jfirepbx_callablestructfields -->
+	</changeSet>
+    
+</databaseChangeLog>

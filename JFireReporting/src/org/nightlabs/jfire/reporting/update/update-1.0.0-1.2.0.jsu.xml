@@ -1,0 +1,22 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    
+   <changeSet id="JFireReportingEAR|1.0.0|1.2.0" author="jfire">
+     	<comment>Refactoring for independence of BIRT. Introduced ScheduledReports.</comment>
+     
+		<!-- The following tables of new classes concerning ScheduledReports should be added by DN automatically
+		
+		     jfirereporting_scheduledreport
+		     jfirereporting_scheduledreportdeliverydelegateemail
+		     jfirereporting_scheduledreportname
+		     jfirereporting_scheduledreportname_names
+		
+		 -->
+		 
+	</changeSet>
+    
+</databaseChangeLog>

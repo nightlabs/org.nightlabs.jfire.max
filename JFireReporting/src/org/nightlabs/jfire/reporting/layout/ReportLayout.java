@@ -1,0 +1,277 @@
+/* *****************************************************************************
+ * JFire - it's hot - Free ERP System - http://jfire.org                       *
+ * Copyright (C) 2004-2005 NightLabs - http://NightLabs.org                    *
+ *                                                                             *
+ * This library is free software; you can redistribute it and/or               *
+ * modify it under the terms of the GNU Lesser General Public                  *
+ * License as published by the Free Software Foundation; either                *
+ * version 2.1 of the License, or (at your option) any later version.          *
+ *                                                                             *
+ * This library is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU           *
+ * Lesser General Public License for more details.                             *
+ *                                                                             *
+ * You should have received a copy of the GNU Lesser General Public            *
+ * License along with this library; if not, write to the                       *
+ *     Free Software Foundation, Inc.,                                         *
+ *     51 Franklin St, Fifth Floor,                                            *
+ *     Boston, MA  02110-1301  USA                                             *
+ *                                                                             *
+ * Or get it online :                                                          *
+ *     http://opensource.org/licenses/lgpl-license.php                         *
+ *                                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+package org.nightlabs.jfire.reporting.layout;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Date;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.FetchGroup;
+import javax.jdo.annotations.FetchGroups;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PersistenceModifier;
+import javax.jdo.annotations.Persistent;
+
+import org.apache.log4j.Logger;
+import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.scheduled.ScheduledReport;
+import org.nightlabs.util.IOUtil;
+
+
+/**
+ * A ReportLayout holds the BIRT report definition.
+ *
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ *
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ * 		persistence-capable-superclass="org.nightlabs.jfire.reporting.layout.ReportRegistryItem"
+ *		detachable="true"
+ *		table="JFireReporting_ReportLayout"
+ *
+ * WORKAROUND: Workaround for MySQL table lock timeout when initializing datastore on ADD COLUMN when using superclass-table
+ * ...and: superclass-table fails with HSQLDB! (MySQL works)
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.fetch-group name="ReportLayout.reportDesign" fetch-groups="default" fields="reportDesign"
+ * @!jdo.fetch-group name="ReportLayout.localisationData" fetch-groups="default" fields="localisationData"
+ * @jdo.fetch-group name="ReportLayout.this" fetch-groups="default, ReportRegistryItem.this" fields="reportDesign"
+ */
+@PersistenceCapable(
+	identityType=IdentityType.APPLICATION,
+	detachable="true",
+	table="JFireReporting_ReportLayout")
+@FetchGroups({
+	@FetchGroup(
+		fetchGroups={"default"},
+		name=ReportLayout.FETCH_GROUP_REPORT_DESIGN,
+		members=@Persistent(name="reportDesign")),
+	@FetchGroup(
+		fetchGroups={"default", "ReportRegistryItem.this"},
+		name=ReportLayout.FETCH_GROUP_THIS_REPORT_LAYOUT,
+		members=@Persistent(name="reportDesign"))
+})
+@Inheritance(strategy=InheritanceStrategy.NEW_TABLE)
+public class ReportLayout extends ReportRegistryItem{
+
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ReportLayout.class);
+
+	public static final String FETCH_GROUP_REPORT_DESIGN = "ReportLayout.reportDesign";
+	public static final String FETCH_GROUP_REPORT_LOCALISATION_DATA = "ReportLayout.localisationData";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
+	 */
+	@Deprecated
+	public static final String FETCH_GROUP_THIS_REPORT_LAYOUT = "ReportLayout.this";
+
+	/**
+	 * Serial version UID. Don't forget to change after changing members.
+	 */
+	private static final long serialVersionUID = 20100106L;
+
+	/**
+	 * @deprecated Only for JDO
+	 */
+	@Deprecated
+	protected ReportLayout() {
+		super();
+	}
+
+	/**
+	 * Creates a new ReportLayout as child of the given
+	 * ReportCategory with the given reportDesign.
+	 *
+	 * @param parentItem The parent category of the new layout. The reportItemRegistryItem type of the new layout will also match its parent.
+	 * @param reportRegistryItemID The reportRegistryItemID of the new layout.
+	 * @param reportDesign The report design data of the new layout.
+	 */
+	public ReportLayout(
+			ReportCategory parentItem,
+			String reportRegistryItemID,
+			byte[] reportDesign
+		)
+	{
+		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
+		this.reportDesign = reportDesign;
+//		this.localisationData = new HashMap<String, RepsortLayoutLocalisationData>();
+	}
+
+	/**
+	 * Creates a new ReportLayout as child of the given ReportCategory and the given primary-key fields.
+	 * No reportDesign data will be set.
+	 *
+	 * @param parentItem The parent category of the new layout.
+	 * @param organisationID The organisationID of the new layout.
+	 * @param reportRegistryItemType The reportRegistryItemType of the new layout.
+	 * @param reportRegistryItemID The reportRegistryItemID of the new layout.
+	 */
+	public ReportLayout(
+			ReportCategory parentItem,
+			String organisationID,
+			String reportRegistryItemType,
+			String reportRegistryItemID,
+			String reportDesignType
+		)
+	{
+		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
+//		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
+	}
+
+	/** Defines the report engine that can handle this ReportLayout, i.e. the backend that can edit and render this layout */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private String reportEngineType;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column sql-type="BLOB"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	@Column(sqlType="BLOB")
+	private byte[] reportDesign;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private Date fileTimestamp;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	@Persistent(persistenceModifier=PersistenceModifier.PERSISTENT)
+	private String fileName;
+
+
+	public void loadStream(InputStream in, long length, Date timeStamp, String name)
+	throws IOException
+	{
+		logger.debug("Loading stream as ReportLayout");
+		boolean error = true;
+		try {
+			DataBuffer db = new DataBuffer((long) (length * 0.6));
+			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
+			try {
+				IOUtil.transferStreamData(in, out);
+			} finally {
+				out.close();
+			}
+			reportDesign = db.createByteArray();
+
+			fileTimestamp = timeStamp;
+			fileName = name;
+
+			error = false;
+		} finally {
+			if (error) { // make sure that in case of an error all the file members are null.
+				fileName = null;
+				fileTimestamp = null;
+				reportDesign = null;
+			}
+		}
+	}
+
+	public void loadStream(InputStream in, String name)
+	throws IOException
+	{
+		loadStream(in, 10 * 1024, new Date(), name);
+	}
+
+	public void loadFile(File f)
+	throws IOException
+	{
+		logger.debug("Loading file "+f+" as ReportLayout");
+		FileInputStream in = new FileInputStream(f);
+		try {
+			loadStream(in, f.length(), new Date(f.lastModified()), f.getName());
+		} finally {
+			in.close();
+		}
+	}
+
+	/**
+	 * Creates a new {@link InputStream} for the report design
+	 * that is wrapped by an {@link InflaterInputStream}.
+	 * This means you can read the report design unzipped from the returend stream.
+	 */
+	public InputStream createReportDesignInputStream() {
+		return new InflaterInputStream(new ByteArrayInputStream(reportDesign));
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public Date getFileTimestamp() {
+		return fileTimestamp;
+	}
+
+	/**
+	 * Returns the engineType of this {@link ReportLayout}. 
+	 * A {@link ReportLayout}s engineType determines which
+	 * report-engine can be used to render the report.
+	 * 
+	 * @return The engineType of this {@link ReportLayout}.
+	 */
+	public String getReportEngineType() {
+		return reportEngineType;
+	}
+
+	@Override
+	protected Collection<ReportRegistryItem> getChildItems() {
+		return null;
+	}
+	
+	@Override
+	public void jdoPreDelete() {
+		super.jdoPreDelete();
+		PersistenceManager pm = getPersistenceManager();
+		Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, this);
+		if(bundle != null && !bundle.isEmpty())
+			pm.deletePersistentAll(bundle);
+		
+		Collection<ScheduledReport> scheduledReports = ScheduledReport.getScheduledReportsByReportLayoutID(pm, (ReportRegistryItemID) JDOHelper.getObjectId(this));
+		if (scheduledReports != null && !scheduledReports.isEmpty())
+			pm.deletePersistentAll(scheduledReports);
+	}
+}

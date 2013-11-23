@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.nightlabs.jfire</groupId>
+	<artifactId>org.nightlabs.jfire.max.aggregator</artifactId>
+	<packaging>pom</packaging>
+	<version>1.3.3-SNAPSHOT</version>
+	<name>${project.artifactId}</name>
+
+	<distributionManagement>
+		<repository>
+			<id>dev.nightlabs.org-libs-releases-local</id>
+			<url>https://dev.nightlabs.org/maven-repository/libs-releases-local</url>
+		</repository>
+		<snapshotRepository>
+			<id>dev.nightlabs.org-libs-snapshots-local</id>
+			<url>https://dev.nightlabs.org/maven-repository/libs-snapshots-local</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<modules>
+		<!-- ##### Backend-projects of jfire-MAX ##### -->
+		<module>../NightLabsConnectionEAR</module>
+		<module>../NightLabsKeyReaderEAR</module>
+		<module>../NightLabsRhinoEAR</module>
+		<module>../NightLabsEditor2DEAR</module>
+		
+		<module>../JFireAsterisk</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk -->
+		<module>../JFireAsteriskEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.asterisk.ear -->
+		
+		<!-- TODO has Eclipse dependencies <module>../org.nightlabs.jfire.base.j2ee</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.j2ee -->
+		<!-- TODO has Eclipse dependencies <module>../org.nightlabs.jfire.base.j2ee.osgi</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.j2ee.osgi -->
+		<module>../JFireChezFrancois</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.chezfrancois -->
+		<module>../JFireChezFrancoisEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.chezfrancois.ear -->
+		
+		<module>../JFireEntityUserSet</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.entityuserset -->
+		<module>../JFireEntityUserSetEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.entityuserset.ear -->
+		
+		<module>../JFireDepartment</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department -->
+		<module>../JFireDepartmentEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.department.ear -->
+
+		<module>../JFireDunning</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dunning -->
+		<module>../JFireDunningEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dunning.ear -->
+
+		<module>../JFireDynamicTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade -->
+		<module>../JFireDynamicTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.dynamictrade.ear -->
+		
+		<module>../JFireGeography</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.geography -->
+		<module>../JFireGeographyEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.geography.ear -->
+		
+		<module>../JFirePropFile</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.prop.file -->
+		<module>../JFirePropFileEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.prop.file.ear -->
+		<module>../JFireHTMLProp</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.prop.html -->
+		<module>../JFireHTMLPropEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.prop.html.ear -->
+		
+		<module>../JFireIssueTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue -->
+		<module>../JFireIssueTrackerBugTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug -->
+		<module>../JFireIssueTrackerBugTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.bug.ear -->
+		<module>../JFireIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.ear -->
+		<module>../JFireIssueTimeTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking -->
+		<module>../JFireIssueTimeTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issuetimetracking.ear -->
+		<module>../JFireIssueTrackingDashboard</module> <!-- org.nigthlabs.jfire:org.nightlabs.jfire.issue.dashboard -->
+		<module>../JFireIssueTrackingDashboardEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.issue.dashboard.ear -->
+		
+		<module>../JFireJbpm</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm -->
+		<module>../JFireJbpmAOP</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.aop -->
+		<module>../JFireJbpmEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.jbpm.ear -->
+		
+		<module>../JFireLDAP</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.base.security.integration.ldap -->
+		<module>../JFireLDAPEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.ldap.ear -->
+
+		<module>../JFireNumericOrganisationID</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.numorgid -->
+		<module>../JFireNumericOrganisationIDEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.numorgid.ear -->
+		
+		<module>../JFirePBX</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.pbx -->
+		<module>../JFirePBXEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.pbx.ear -->
+		
+		<module>../JFirePersonRelation</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation -->
+		<module>../JFirePersonRelationEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.ear -->
+		<module>../JFirePersonRelationIssueTracking</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking -->
+		<module>../JFirePersonRelationIssueTrackingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.personrelation.issuetracking.ear -->
+		
+		<module>../JFireReporting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
+		<module>../JFireReportingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting -->
+		<module>../JFireReportingEngineBirt</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt -->
+		<module>../JFireReportingEngineBirtEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.engine.birt.ear -->
+		<module>../JFireReportingTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade -->
+		<module>../JFireReportingTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.reporting.trade.ear -->
+		<module>../JFireScripting</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting -->
+		<module>../JFireScriptingEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.ear -->
+		<module>../JFireScriptingEditor2D</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d -->
+		<module>../JFireScriptingEditor2DEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.scripting.editor2d.ear -->
+		<module>../JFireSimpleTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade -->
+		<module>../JFireSimpleTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.simpletrade.ear -->
+		<module>../JFireTrade</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade -->
+		<module>../JFireTradeEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.ear -->
+		<module>../JFireTradeDashboard</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.dashboard -->
+		<module>../JFireTradeDashboardEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.dashboard.ear -->
+		
+		<module>../org.nightlabs.jfire.reporting.birt</module>
+		<module>../org.nightlabs.jfire.reporting.oda.wrapper</module>
+		<!--module>../org.nightlabs.jfire.reporting.oda.client</module-->
+		<module>../org.nightlabs.jfire.reporting.oda.server</module>
+		<module>../org.nightlabs.jfire.trade.editor2d</module>
+		<module>../JFireTradeEditor2DEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.trade.editor2d.ear -->
+		
+		<!-- generics compile error with javac <module>../JFireTestSuiteDepartment</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.department -->
+		<!-- generics compile error with javac <module>../JFireTestSuiteIssueTracking</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.testsuite.issuetracking -->
+		<module>../JFireVoucher</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher -->
+		<module>../JFireVoucherEditor2D</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher.editor2d.iofilter -->
+		<module>../JFireVoucherEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.voucher.ear -->
+		
+		<!-- requires trade <module>../JFireWebShopDemo</module> --> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.demoshop -->
+		<module>../JFireWebShopBase</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.webshop -->
+		<module>../JFireWebShopBaseEAR</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.web.webshop.ear -->
+		
+		<!-- 
+		<module>../JFireTestSuiteJFireBaseEAR</module>
+		-->
+		
+		<module>../org.nightlabs.jfire.max.assembly</module> <!-- org.nightlabs.jfire:org.nightlabs.jfire.max.assembly -->
+	</modules>
+</project>

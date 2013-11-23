@@ -1,0 +1,26 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initialiser-content_0_2.dtd">
+<script-category 
+	id="OrderData-Category"
+	type="JFireReportingTrade-OrderData"
+>
+	<name language="de">Auftrags-Daten</name>
+	<name language="en">Order-Data</name>
+
+	<parameter-set>
+		<name language="de">ParameterSet: Auftrag</name>
+		<name language="en">ParameterSet: Order</name>
+		<parameter name="persistenceManager" type="javax.jdo.PersistenceManager"/>
+		<parameter name="orderID" type="org.nightlabs.jfire.trade.id.OrderID"/>			
+	</parameter-set>
+		
+	<script 
+		file="OrderDataArticles.javaclass" 
+		id="OrderDataArticles"
+		resultClass="org.eclipse.datatools.connectivity.oda.jfire.IResultSet"
+	>
+	<!-- id is optional and defaults to the value of file -->
+		<name language="de">Auftrag: Posten</name>
+		<name language="en">Order: Articles</name>
+	</script>
+	
+</script-category>

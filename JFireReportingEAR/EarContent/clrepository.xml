@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE classloader-repository
+PUBLIC "-//NightLabs GmbH//DTD ClassLoader Repository 1.1//EN"
+"http://www.nightlabs.de/dtd/clrepository_1_1.dtd">
+
+<classloader-repository>
+<!--
+    The following element publishes all packages beginning with
+    'com.nightlabs.' or 'org.nightlabs.' for the current directory
+    (no target means the same as 'target="."') and recursively all
+    directories that don't override.
+-->
+	<publish>
+		<resources>org\/eclipse\/datatools\/connectivity\/oda\/jfire\/.*</resources>
+	</publish>
+</classloader-repository>

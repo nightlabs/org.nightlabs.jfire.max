@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns="urn:jbpm.org:jpdl-3.1"  name="myfirst">
+   <swimlane name="swimlane1">
+      <assignment class="test.myfirst.MyAssignmentHandler" config-type="bean">
+         <bla></bla>
+      </assignment>
+   </swimlane>
+   <start-state name="start">
+      <transition name="to_auction" to="auction">
+         <action name="ActionHandler1" class="test.myfirst.ActionHandler1" config-type="bean"></action>
+      </transition>
+   </start-state>
+   <state name="auction">
+      <transition name="to_task1" to="task1">
+         <action name="ActionHandler2" class="test.myfirst.ActionHandler2" config-type="bean">
+            <testVariable></testVariable>
+         </action>
+      </transition>
+   </state>
+   <end-state name="end1"></end-state>
+   <task-node name="task1">
+      <task name="task1" blocking="true" swimlane="swimlane1"></task>
+      <transition name="to_end" to="end1">
+      </transition>
+      <transition name="to_decision1" to="decision1"></transition>
+   </task-node>
+   <decision name="decision1">
+      <transition name="to_state2" to="state2"></transition>
+      <transition name="to_state1" to="state1"></transition>
+   </decision>
+   <state name="state1">
+      <transition name="" to="end2"></transition>
+   </state>
+   <state name="state2">
+      <transition name="" to="end2"></transition>
+   </state>
+   <end-state name="end2"></end-state>
+</process-definition>

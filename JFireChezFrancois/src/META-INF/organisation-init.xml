@@ -1,0 +1,12 @@
+<organisation-initialisation
+		xmlns="urn:jfire.org:organisation-init_1_1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:jfire.org:organisation-init_1_1 http://dev.nightlabs.org/xml/organisation-init_1_1.xsd ">
+
+	<init invocation="org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserRemote.initialise">
+		<depends invocation="org.nightlabs.jfire.simpletrade" resolution="optional" />
+		<depends invocation="org.nightlabs.jfire.voucher" resolution="optional" />
+		<depends invocation="org.nightlabs.jfire.dynamictrade" resolution="optional" />
+	</init>
+
+</organisation-initialisation>

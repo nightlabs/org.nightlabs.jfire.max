@@ -1,0 +1,27 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    
+   <changeSet id="JFireIssueTrackingEAR|1.0.0|1.2.0" author="jfire">
+     	<comment>Deleted Class IssueHistoryItemText</comment>
+     
+		<ext:dnDropClassTable className="org.nightlabs.jfire.issue.history.IssueHistoryItemText.texts"/>
+		<ext:dnDropClassTable className="org.nightlabs.jfire.issue.history.IssueHistoryItemText"/>
+		
+		<!-- The following new tables can be added by DN automatically
+		
+			jfireissuetimetracking_projectcost
+			jfireissuetimetracking_projectcostvalue
+			jfireissuetracking_issuetableconfigmodule
+			jfireissuetracking_issuetableconfigmodule_columndescriptors
+			jfireissuetracking_personissuelinktableconfigmodule
+			jfireissuetracking_personissuelinktableconfigmodule_columnde5lto
+		
+		 -->
+		
+	</changeSet>
+    
+</databaseChangeLog>

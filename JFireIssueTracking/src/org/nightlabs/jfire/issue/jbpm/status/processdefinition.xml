@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition  xmlns=""  name="dev.jfire.org:IssueType">
+
+
+	<start-state name="dev.jfire.org:new">
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:open" name="open"></transition>
+		<transition to="dev.jfire.org:openedImplicitely" name="acknowledge"></transition>
+		<transition to="dev.jfire.org:openedImplicitely" name="confirm"></transition>
+		<transition to="dev.jfire.org:openedImplicitely" name="dev.jfire.org:assign"></transition>
+		<transition to="dev.jfire.org:openedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:openedImplicitely" name="close"></transition>
+	</start-state>
+
+
+	<state name="dev.jfire.org:acknowledged">
+		<transition to="dev.jfire.org:confirmed" name="confirm"></transition>
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="dev.jfire.org:assign"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="close"></transition>
+	</state>
+
+	<state name="dev.jfire.org:assigned">
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:resolved" name="resolve"></transition>
+		<transition to="dev.jfire.org:resolvedImplicitely" name="close"></transition>
+		<transition to="dev.jfire.org:open" name="dev.jfire.org:unassign"></transition>		
+	</state>
+
+	<state name="dev.jfire.org:confirmed">
+		<transition to="dev.jfire.org:assigned" name="dev.jfire.org:assign"></transition>
+	</state>
+
+	<state name="dev.jfire.org:resolved">
+		<transition to="dev.jfire.org:closed" name="close"></transition>
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:reopened" name="reopen"></transition>
+	</state>
+
+	<state name="dev.jfire.org:closed">
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:reopened" name="reopen"></transition>
+	</state>
+
+	<node name="dev.jfire.org:acknowledgedImplicitely">
+		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
+		<transition to="dev.jfire.org:confirmed" name="confirm"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="dev.jfire.org:assign"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="close"></transition>
+	</node>
+
+	<node name="dev.jfire.org:confirmedImplicitely">
+		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
+		<transition to="dev.jfire.org:assigned" name="dev.jfire.org:assign"></transition>
+		<transition to="dev.jfire.org:resolved" name="resolve"></transition>
+		<transition to="dev.jfire.org:resolvedImplicitely" name="close"></transition>
+	</node>
+
+	<node name="dev.jfire.org:resolvedImplicitely">
+		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
+		<transition to="dev.jfire.org:closed" name="close"></transition>
+	</node>
+
+	<node name="dev.jfire.org:reopened">
+		<transition to="dev.jfire.org:open" name="reopen"></transition>
+	</node>
+
+	<state name="dev.jfire.org:open">
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="confirm"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="dev.jfire.org:assign"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="close"></transition>
+		<transition to="dev.jfire.org:acknowledged" name="acknowledge"></transition>
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+	</state>
+
+	<node name="dev.jfire.org:openedImplicitely">		
+		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
+		<transition to="dev.jfire.org:acknowledged" name="acknowledge"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="confirm"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="dev.jfire.org:assign"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="close"></transition>
+	</node>
+
+
+	<end-state name="dev.jfire.org:rejected"></end-state>
+
+
+</process-definition>

@@ -1,0 +1,5 @@
+Origin: http://commons.wikimedia.org/wiki/File:Ruzgar-deneme-iletisim2.png
+License: GNU Free Documentation License, Version 1.2 or later.
+
+Derived work by Marco Schulze: Added the exclamation mark on 2009-07-20.
+Marco ;-)

@@ -1,0 +1,30 @@
+CountryID;RegionID;LanguageID;RegionName
+CH;AG;de;Aargau
+CH;AI;de;Appenzell Innerrhoden
+CH;AR;de;Appenzell Ausserrhoden
+CH;BE;de;Bern
+CH;BL;de;Basel-Landschaft
+CH;BS;de;Basel-Stadt
+CH;FR;fr;Fribourg
+CH;FR;de;Freiburg
+CH;GE;fr;Genève
+CH;GL;de;Glarus
+CH;GR;de;Graubünden
+CH;JU;fr;Jura
+CH;LU;de;Luzern
+CH;NE;fr;Neuchâtel
+CH;NW;de;Nidwalden
+CH;OW;de;Obwalden
+CH;SG;de;Sankt Gallen
+CH;SH;de;Schaffhausen
+CH;SO;de;Solothurn
+CH;SZ;de;Schwyz
+CH;TG;de;Thurgau
+CH;TI;it;Ticino
+CH;UR;de;Uri
+CH;VD;fr;Vaud
+CH;VD;de;Waadt
+CH;VS;fr;Valais
+CH;VS;de;Wallis
+CH;ZG;de;Zug
+CH;ZH;de;Zürich

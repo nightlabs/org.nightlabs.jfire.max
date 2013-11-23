@@ -1,0 +1,32 @@
+Level:
+	1: Continent (Erdteil)
+	2: Country (Land)
+	3: Region (Bundesland, Kanton)
+	4: Administrative Region (Regierungsbezirk)
+	5: Rural District (Landkreis)
+	6: City (Stadt, Ortschaft)
+	7: District (Stadtteil)
+	8: Sub-district ???
+
+sql:
+------
+select * from geodb_hierarchies h
+left join geodb_textdata t on h.loc_id = t.loc_id and t.text_type = 500100000
+left join geodb_locations l using (loc_id)
+left join geodb_type_names tn on tn.type_id = l.loc_type
+where h.level = 4
+------
+
+******************
+
+text_type:
+	500100000: Name
+	500300000: Zip
+
+
+sql:
+------
+select * from geodb_type_names
+------
+
+******************

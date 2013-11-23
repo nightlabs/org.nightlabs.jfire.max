@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE aop PUBLIC
+   "-//JBoss//DTD JBOSS AOP 1.0//EN"
+   "http://labs.jboss.com/portal/jbossaop/dtd/jboss-aop_1_0.dtd">
+
+<aop>
+	<aspect class="org.nightlabs.jfire.jbpm.aop.JFireLoggingAspect" scope="PER_VM"/>
+	
+	<pointcut name="OnNodeEnter" expr="execution(void org.jbpm.graph.def.Node->enter(..))"/>
+	<bind pointcut="OnNodeEnter">  
+		<advice name="onNodeEnter" aspect="org.nightlabs.jfire.jbpm.aop.JFireLoggingAspect"/>
+	</bind>
+	
+	<!-- 
+	<pointcut name="OnJbpmContextNewProcessInstanceForUpdate" expr="call(* org.jbpm.JbpmContext->newProcessInstanceForUpdate(..))"/>
+	<bind pointcut="OnJbpmContextNewProcessInstanceForUpdate">  
+		<advice name="onJbpmContextNewProcessInstanceForUpdate" aspect="org.nightlabs.jfire.jbpm.aop.JFireLoggingAspect"/>
+	</bind>
+	 -->
+</aop>

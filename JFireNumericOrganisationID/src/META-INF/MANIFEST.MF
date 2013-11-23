@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: JFireNumericOrganisationID
+Bundle-Version: 1.3.1

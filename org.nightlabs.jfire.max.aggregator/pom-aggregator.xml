@@ -11,12 +11,12 @@
 
 	<distributionManagement>
 		<repository>
-			<id>dev.nightlabs.org-libs-releases-local</id>
-			<url>https://dev.nightlabs.org/maven-repository/libs-releases-local</url>
+			<id>cloudbees.nightlabs.release</id>
+			<url>dav:https://repository-nightlabs.forge.cloudbees.com/release/</url>
 		</repository>
 		<snapshotRepository>
-			<id>dev.nightlabs.org-libs-snapshots-local</id>
-			<url>https://dev.nightlabs.org/maven-repository/libs-snapshots-local</url>
+			<id>cloudbees.nightlabs.snapshot</id>
+			<url>dav:https://repository-nightlabs.forge.cloudbees.com/snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

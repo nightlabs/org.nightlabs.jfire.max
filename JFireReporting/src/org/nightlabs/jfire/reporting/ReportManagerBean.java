@@ -725,22 +725,24 @@ implements ReportManagerRemote
 		ReportParameterManagerRemote rpm = JFireEjb3Factory.getRemoteBean(ReportParameterManagerRemote.class, SecurityReflector.getInitialContextProperties());
 		Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> ids = rpm.getReportParameterAcquisitionSetupIDs(itemIDs);
 		ReportParameterAcquisitionSetupID setupID = ids.get(layoutID);
-		Set<ReportParameterAcquisitionSetupID> rpasIDs = new HashSet<ReportParameterAcquisitionSetupID>();
-		rpasIDs.add(setupID);
-		parameterSetup = rpm.getReportParameterAcquisitionSetups(rpasIDs, 
-				new String[] {FetchPlan.DEFAULT, 
-				ReportParameterAcquisitionSetup.FETCH_GROUP_VALUE_ACQUISITION_SETUPS,
-				ReportParameterAcquisitionSetup.FETCH_GROUP_DEFAULT_USE_CASE,
-				ReportParameterAcquisitionUseCase.FETCH_GROUP_NAME,
-				ReportParameterAcquisitionUseCase.FETCH_GROUP_DESCRIPTION,
-				ValueAcquisitionSetup.FETCH_GROUP_VALUE_CONSUMER_BINDINGS,
-				ValueAcquisitionSetup.FETCH_GROUP_VALUE_PROVIDER_CONFIGS,
-				ValueAcquisitionSetup.FETCH_GROUP_PARAMETER_CONFIGS,
-				ValueProviderConfig.FETCH_GROUP_MESSAGE,
-				ValueConsumerBinding.FETCH_GROUP_CONSUMER,
-				ValueConsumerBinding.FETCH_GROUP_PROVIDER}, 
-				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT).iterator().next();
-
+		
+		if (setupID != null) {
+			Set<ReportParameterAcquisitionSetupID> rpasIDs = new HashSet<ReportParameterAcquisitionSetupID>();
+			rpasIDs.add(setupID);
+			parameterSetup = rpm.getReportParameterAcquisitionSetups(rpasIDs, 
+					new String[] {FetchPlan.DEFAULT, 
+					ReportParameterAcquisitionSetup.FETCH_GROUP_VALUE_ACQUISITION_SETUPS,
+					ReportParameterAcquisitionSetup.FETCH_GROUP_DEFAULT_USE_CASE,
+					ReportParameterAcquisitionUseCase.FETCH_GROUP_NAME,
+					ReportParameterAcquisitionUseCase.FETCH_GROUP_DESCRIPTION,
+					ValueAcquisitionSetup.FETCH_GROUP_VALUE_CONSUMER_BINDINGS,
+					ValueAcquisitionSetup.FETCH_GROUP_VALUE_PROVIDER_CONFIGS,
+					ValueAcquisitionSetup.FETCH_GROUP_PARAMETER_CONFIGS,
+					ValueProviderConfig.FETCH_GROUP_MESSAGE,
+					ValueConsumerBinding.FETCH_GROUP_CONSUMER,
+					ValueConsumerBinding.FETCH_GROUP_PROVIDER}, 
+					NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT).iterator().next();
+		}
 		//Preparing the ReportTextPartConfiguration
 		ReportTextPartConfiguration reportTextPartConfiguration = null;
 		ReportTextPartManagerRemote rtpm = JFireEjb3Factory.getRemoteBean(ReportTextPartManagerRemote.class, SecurityReflector.getInitialContextProperties());
@@ -884,91 +886,94 @@ implements ReportManagerRemote
 			Map<Object, Integer> object2IdNo = new HashMap<Object, Integer>();
 
 			//Use-case
-			Map<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> valueAcquisitionSetups = 
-				parameterSetup.getValueAcquisitionSetups();
-			for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> setup : valueAcquisitionSetups.entrySet()) {
-				Element useCaseNode = doc.createElement(ReportingConstants.USE_CASE_ELEMENT);
-				useCaseNode.setAttribute(ReportingConstants.USE_CASE_ATTRIBUTE_ID, setup.getKey().getReportParameterAcquisitionUseCaseID());
-				useCaseNode.setAttribute(ReportingConstants.USE_CASE_ATTRIBUTE_DEFAULT, "true");
-
-				generateI18nElements(doc, useCaseNode, ReportingConstants.USE_CASE_ELEMENT_NAME, setup.getKey().getName());
-				generateI18nElements(doc, useCaseNode, ReportingConstants.USE_CASE_ELEMENT_DESCRIPTION, setup.getKey().getDescription());
-
-				//Parameters
-				Element parametersNode = doc.createElement("parameters");
-				useCaseNode.appendChild(parametersNode);
-
-				int idx = 0;
-				for (AcquisitionParameterConfig parameterConfig : setup.getValue().getParameterConfigs()) {
-					Element parameterNode = doc.createElement(ReportingConstants.PARAMETER_ELEMENT);
-					parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_ID, Integer.toString(idx++));
-					parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_NAME, parameterConfig.getParameterID()); //TODO!!! WATCHME!!! Name == PARAMETER_ID ;-)
-					parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_TYPE, parameterConfig.getParameterType());
-					parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_X, Integer.toString(parameterConfig.getX()));
-					parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_Y, Integer.toString(parameterConfig.getY()));
-
-					object2IdNo.put(parameterConfig, idNo);
-					idNo++;
-
-					parametersNode.appendChild(parameterNode);
+			Map<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> valueAcquisitionSetups = null;
+			if (parameterSetup != null)
+				valueAcquisitionSetups = parameterSetup.getValueAcquisitionSetups();
+			if (valueAcquisitionSetups != null) {
+				for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> setup : valueAcquisitionSetups.entrySet()) {
+					Element useCaseNode = doc.createElement(ReportingConstants.USE_CASE_ELEMENT);
+					useCaseNode.setAttribute(ReportingConstants.USE_CASE_ATTRIBUTE_ID, setup.getKey().getReportParameterAcquisitionUseCaseID());
+					useCaseNode.setAttribute(ReportingConstants.USE_CASE_ATTRIBUTE_DEFAULT, "true");
+	
+					generateI18nElements(doc, useCaseNode, ReportingConstants.USE_CASE_ELEMENT_NAME, setup.getKey().getName());
+					generateI18nElements(doc, useCaseNode, ReportingConstants.USE_CASE_ELEMENT_DESCRIPTION, setup.getKey().getDescription());
+	
+					//Parameters
+					Element parametersNode = doc.createElement("parameters");
+					useCaseNode.appendChild(parametersNode);
+	
+					int idx = 0;
+					for (AcquisitionParameterConfig parameterConfig : setup.getValue().getParameterConfigs()) {
+						Element parameterNode = doc.createElement(ReportingConstants.PARAMETER_ELEMENT);
+						parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_ID, Integer.toString(idx++));
+						parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_NAME, parameterConfig.getParameterID()); //TODO!!! WATCHME!!! Name == PARAMETER_ID ;-)
+						parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_TYPE, parameterConfig.getParameterType());
+						parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_X, Integer.toString(parameterConfig.getX()));
+						parameterNode.setAttribute(ReportingConstants.PARAMETER_ELEMENT_ATTRIBUTE_Y, Integer.toString(parameterConfig.getY()));
+	
+						object2IdNo.put(parameterConfig, idNo);
+						idNo++;
+	
+						parametersNode.appendChild(parameterNode);
+					}
+	
+					//Value-provider-configs
+					Element valueProviderConfigsNode = doc.createElement(ReportingConstants.VALUE_PROVIDER_CONFIGS_ELEMENT);
+					useCaseNode.appendChild(valueProviderConfigsNode);
+	
+					for (ValueProviderConfig valueProviderConfig : setup.getValue().getValueProviderConfigs()) {
+						Element providerConfigNode = doc.createElement(ReportingConstants.PROVIDER_CONFIG_ELEMENT);
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ID, Integer.toString(idx++));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ORGANISATION_ID, "dev.jfire.org");
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_CATEGORY_ID, valueProviderConfig.getValueProviderCategoryID());
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_VALUE_PROVIDER_ID, valueProviderConfig.getValueProviderID());
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_INDEX, Integer.toString(valueProviderConfig.getPageIndex()));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_ROW, Integer.toString(valueProviderConfig.getPageRow()));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_COLUMN, Integer.toString(valueProviderConfig.getPageColumn()));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ALLOW_NULL_OUTPUT_VALUE, Boolean.toString(valueProviderConfig.isAllowNullOutputValue()));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_SHOW_MESSAGE_IN_HEADER, Boolean.toString(valueProviderConfig.isShowMessageInHeader()));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_GROW_VERTICALLY, Boolean.toString(valueProviderConfig.isGrowVertically()));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_X, Integer.toString(valueProviderConfig.getX()));
+						providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_Y, Integer.toString(valueProviderConfig.getY()));
+	
+						object2IdNo.put(valueProviderConfig, idNo);
+						idNo++;
+	
+						generateI18nElements(doc, providerConfigNode, ReportingConstants.PROVIDER_CONFIG_ELEMENT_MESSAGE, valueProviderConfig.getMessage());
+	
+						valueProviderConfigsNode.appendChild(providerConfigNode);
+					}
+	
+					//Value-consumer-bindings
+					Element valueConsumerBindingsNode = doc.createElement(ReportingConstants.VALUE_CONSUMER_BINDINGS_ELEMENT);
+					useCaseNode.appendChild(valueConsumerBindingsNode);
+	
+					for (ValueConsumerBinding valueConsumerBinding : setup.getValue().getValueConsumerBindings()) {
+						Element consumerBindingNode = doc.createElement(ReportingConstants.VALUE_CONSUMER_BINDING_ELEMENT);
+	
+						Element bindingProvider = doc.createElement(ReportingConstants.BINDING_PROVIDER_ELEMENT);
+						bindingProvider.setAttribute(ReportingConstants.BINDING_PROVIDER_ELEMENT_ATTRIBUTE_ID, String.valueOf(object2IdNo.get(valueConsumerBinding.getProvider())));
+	
+						Element bindingParameter = doc.createElement(ReportingConstants.BINDING_PARAMETER_ELEMENT);
+						bindingParameter.setAttribute(ReportingConstants.BINDING_PARAMETER_ELEMENT_ATTRIBUTE_NAME, valueConsumerBinding.getParameterID());
+	
+						Element bindingConsumer = doc.createElement(ReportingConstants.BINDING_CONSUMER_ELEMENT); 
+						bindingConsumer.setAttribute(ReportingConstants.BINDING_CONSUMER_ELEMENT_ATTRIBUTE_ID, String.valueOf(object2IdNo.get(valueConsumerBinding.getConsumer())));
+	
+						consumerBindingNode.appendChild(bindingProvider);
+						consumerBindingNode.appendChild(bindingParameter);
+						consumerBindingNode.appendChild(bindingConsumer);
+	
+						object2IdNo.put(valueConsumerBinding, idNo);
+						idNo++;
+	
+						valueConsumerBindingsNode.appendChild(consumerBindingNode);
+					}
+	
+					parameterAcquisition.appendChild(useCaseNode);	
 				}
-
-				//Value-provider-configs
-				Element valueProviderConfigsNode = doc.createElement(ReportingConstants.VALUE_PROVIDER_CONFIGS_ELEMENT);
-				useCaseNode.appendChild(valueProviderConfigsNode);
-
-				for (ValueProviderConfig valueProviderConfig : setup.getValue().getValueProviderConfigs()) {
-					Element providerConfigNode = doc.createElement(ReportingConstants.PROVIDER_CONFIG_ELEMENT);
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ID, Integer.toString(idx++));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ORGANISATION_ID, "dev.jfire.org");
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_CATEGORY_ID, valueProviderConfig.getValueProviderCategoryID());
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_VALUE_PROVIDER_ID, valueProviderConfig.getValueProviderID());
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_INDEX, Integer.toString(valueProviderConfig.getPageIndex()));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_ROW, Integer.toString(valueProviderConfig.getPageRow()));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_PAGE_COLUMN, Integer.toString(valueProviderConfig.getPageColumn()));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_ALLOW_NULL_OUTPUT_VALUE, Boolean.toString(valueProviderConfig.isAllowNullOutputValue()));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_SHOW_MESSAGE_IN_HEADER, Boolean.toString(valueProviderConfig.isShowMessageInHeader()));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_GROW_VERTICALLY, Boolean.toString(valueProviderConfig.isGrowVertically()));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_X, Integer.toString(valueProviderConfig.getX()));
-					providerConfigNode.setAttribute(ReportingConstants.PROVIDER_CONFIG_ELEMENT_ATTRIBUTE_Y, Integer.toString(valueProviderConfig.getY()));
-
-					object2IdNo.put(valueProviderConfig, idNo);
-					idNo++;
-
-					generateI18nElements(doc, providerConfigNode, ReportingConstants.PROVIDER_CONFIG_ELEMENT_MESSAGE, valueProviderConfig.getMessage());
-
-					valueProviderConfigsNode.appendChild(providerConfigNode);
-				}
-
-				//Value-consumer-bindings
-				Element valueConsumerBindingsNode = doc.createElement(ReportingConstants.VALUE_CONSUMER_BINDINGS_ELEMENT);
-				useCaseNode.appendChild(valueConsumerBindingsNode);
-
-				for (ValueConsumerBinding valueConsumerBinding : setup.getValue().getValueConsumerBindings()) {
-					Element consumerBindingNode = doc.createElement(ReportingConstants.VALUE_CONSUMER_BINDING_ELEMENT);
-
-					Element bindingProvider = doc.createElement(ReportingConstants.BINDING_PROVIDER_ELEMENT);
-					bindingProvider.setAttribute(ReportingConstants.BINDING_PROVIDER_ELEMENT_ATTRIBUTE_ID, String.valueOf(object2IdNo.get(valueConsumerBinding.getProvider())));
-
-					Element bindingParameter = doc.createElement(ReportingConstants.BINDING_PARAMETER_ELEMENT);
-					bindingParameter.setAttribute(ReportingConstants.BINDING_PARAMETER_ELEMENT_ATTRIBUTE_NAME, valueConsumerBinding.getParameterID());
-
-					Element bindingConsumer = doc.createElement(ReportingConstants.BINDING_CONSUMER_ELEMENT); 
-					bindingConsumer.setAttribute(ReportingConstants.BINDING_CONSUMER_ELEMENT_ATTRIBUTE_ID, String.valueOf(object2IdNo.get(valueConsumerBinding.getConsumer())));
-
-					consumerBindingNode.appendChild(bindingProvider);
-					consumerBindingNode.appendChild(bindingParameter);
-					consumerBindingNode.appendChild(bindingConsumer);
-
-					object2IdNo.put(valueConsumerBinding, idNo);
-					idNo++;
-
-					valueConsumerBindingsNode.appendChild(consumerBindingNode);
-				}
-
-				parameterAcquisition.appendChild(useCaseNode);	
 			}
-
+			
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty(OutputKeys.ENCODING, ReportingConstants.DESCRIPTOR_FILE_ENCODING);
